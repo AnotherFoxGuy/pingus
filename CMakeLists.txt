@@ -15,25 +15,37 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 cmake_minimum_required(VERSION 3.0)
+
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.19.157.tar.gz"
+    SHA1 "4bd7cbd1fb5dd33f52e19e05d893d362712cea9e"
+)
+
 project(pingus VERSION 0.8.0)
+include(GNUInstallDirs)
 
 option(WARNINGS "Switch on extra warnings" OFF)
 option(WERROR "Turn warnings into errors" OFF)
 option(BUILD_TESTS "Build test cases" OFF)
 option(BUILD_EXTRA "Build extra stuff" OFF)
 
-include(GNUInstallDirs)
+hunter_add_package(SDL2)
+hunter_add_package(SDL_image)
+hunter_add_package(SDL_mixer)
+hunter_add_package(PNG)
+hunter_add_package(jsoncpp)
+hunter_add_package(Boost COMPONENTS system filesystem signals)
+
+find_package(SDL2 CONFIG REQUIRED)
+find_package(SDL_image CONFIG REQUIRED)
+find_package(SDL_mixer CONFIG REQUIRED)
+find_package(PNG CONFIG REQUIRED)
+find_package(jsoncpp CONFIG REQUIRED)
+find_package(Boost CONFIG REQUIRED system filesystem signals)
 
 find_package(Threads REQUIRED)
-find_package(PkgConfig REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(Boost COMPONENTS system filesystem signals REQUIRED)
-
-pkg_search_module(SDL2 REQUIRED sdl2)
-pkg_search_module(SDL2IMAGE REQUIRED SDL2_image>=2.0.0)
-pkg_search_module(SDL2MIXER REQUIRED SDL2_mixer>=2.0.0)
-pkg_search_module(PNG REQUIRED libpng)
-pkg_search_module(JSONCPP REQUIRED jsoncpp)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
 
@@ -103,12 +115,12 @@ target_link_libraries(libpingus PUBLIC
   logmich
   tinygettext
   sexp
-  ${Boost_LIBRARIES}
-  ${SDL2_LIBRARIES}
-  ${SDL2IMAGE_LIBRARIES}
-  ${SDL2MIXER_LIBRARIES}
-  ${PNG_LIBRARIES}
-  ${JSONCPP_LIBRARIES}
+  Boost::system Boost::filesystem Boost::signals
+  SDL2::SDL2
+  ONSDL_image::SDL_image
+  SDL_mixer::SDL_mixer
+  PNG::png
+  jsoncpp_lib_static
   ${OPENGL_LIBRARIES})
 target_include_directories(libpingus SYSTEM PUBLIC
   ${JSONCPP_INCLUDE_DIRS})
